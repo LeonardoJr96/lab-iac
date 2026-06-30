@@ -40,3 +40,22 @@
     - name: Aguardar nos ficarem Ready
       shell: kubectl wait --for=condition=Ready nodes --all --timeout=120s
       changed_when: false
+
+- name: Aplicar labels nos workers
+  hosts: control_plane
+  become: true
+  tasks:
+    - name: Label nodes frontend
+      command: kubectl label node {{ item }} role=frontend --overwrite
+      loop: "{{ groups['frontend_workers'] }}"
+      changed_when: true
+
+    - name: Label nodes backend
+      command: kubectl label node {{ item }} role=backend --overwrite
+      loop: "{{ groups['backend_workers'] }}"
+      changed_when: true
+
+    - name: Label nodes control Plane
+      command: kubectl label node {{ item }} role=control-plane --overwrite
+      loop: "{{ groups['control_plane'] }}"
+      changed_when: true
