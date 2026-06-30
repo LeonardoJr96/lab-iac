@@ -1,0 +1,59 @@
+---
+- name: Preparar servidores para futura instalacao do Kubernetes
+  hosts: k8s_nodes
+  become: true
+  tasks:
+    - name: Atualizar cache do APT
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Instalar pacotes basicos
+      ansible.builtin.apt:
+        name: "{{ common_packages }}"
+        state: present
+
+    - name: Criar usuario administrativo
+      ansible.builtin.user:
+        name: "{{ admin_user }}"
+        groups: sudo
+        append: true
+        shell: /bin/bash
+        create_home: true
+
+    - name: Criar diretorio .ssh do usuario administrativo
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.ssh"
+        state: directory
+        owner: "devops"
+        group: "devops"
+        mode: "0700"
+
+    - name: Configurar authorized_keys do usuario administrativo
+      ansible.builtin.copy:
+        content: "{{ admin_pubkey }}"
+        owner: "devops"
+        group: "devops"
+        mode: "0600"
+
+    - name: Desativar autenticacao SSH por senha
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+      notify: Reiniciar SSH
+
+    - name: Desativar login SSH de root
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin no'
+        state: present
+      notify: Reiniciar SSH
+
+  handlers:
+    - name: Reiniciar SSH
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
