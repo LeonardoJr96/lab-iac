@@ -1,0 +1,16 @@
+kind: Kustomization
+namespace: registro-atividades
+resources:
+- namespace.yaml
+- postgres-pvc.yaml
+- postgres-deployment.yaml
+- postgres-service.yaml
+- api-deployment.yaml
+- api-service.yaml
+images:
+- name: leonardojr96/registro-atividades-backend
+  newName: leonardojr96/registro-atividades-backend
+  newTag: latest
+- name: leonardojr96/registro-atividades-backend
+  newTag: cbd5d082ee9433cb4d6adba010afd615585758f5
+apiVersion: kustomize.config.k8s.io/v1beta1

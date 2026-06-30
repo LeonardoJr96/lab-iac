@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lab-devops-backend
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/leonardojr96/lab-iac.git
+    targetRevision: HEAD
+    path: k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: lab-devops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

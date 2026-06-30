@@ -1,0 +1,11 @@
+kind: Kustomization
+namespace: lab-devops
+resources:
+- namespace.yaml
+- api-deployment.yaml
+- api-service.yaml
+images:
+- name: leonardojr96/lab-devops-backend
+  newName: leonardojr96/lab-devops-backend
+  newTag: latest
+apiVersion: kustomize.config.k8s.io/v1beta1
