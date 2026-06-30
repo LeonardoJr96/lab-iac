@@ -19,7 +19,7 @@
       changed_when: false
 
 - name: Instalar k3s nos workers
-  hosts: workers
+  hosts: workers_cluster
   become: true
   vars:
     master_private_ip: "{{ hostvars[groups['control_plane'][0]]['private_ip'] }}"

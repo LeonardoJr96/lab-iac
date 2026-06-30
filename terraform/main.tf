@@ -6,6 +6,10 @@ terraform {
          source  = "hashicorp/aws"
          version = "~> 5.0"
       }
+      local = {
+         source  = "hashicorp/local"
+         version = "~> 2.5"
+    }
    }
 }
 
@@ -14,21 +18,13 @@ provider "aws" {
 }
 
 data "aws_vpc" "default" {
-   vpc = var.aws_vpc
+   default = true
 }
 
 data "aws_subnets" "default" {
    filter {
       name   = "vpc-id"
       values = [data.aws_vpc.default.id]
-   }
-}
-
-locals {
-   nodes = {
-      control-plane = { role = "control-plane" }
-      worker-1      = { role = "worker" }
-      worker-2      = { role = "worker" }
    }
 }
 
@@ -65,11 +61,20 @@ resource "aws_security_group" "nodes_sg" {
    }
 }
 
+locals {
+  nodes = {
+    "cp-1"       = { role = "control-plane" }
+    "worker-fe"  = { role = "frontend" }
+    "worker-be1" = { role = "backend" }
+    "worker-be2" = { role = "backend" }
+  }
+}
+
 resource "aws_instance" "nodes" {
    for_each = local.nodes
 
    ami                         = var.ami_id
-   instance_type               = var.instance_type
+   instance_type               = each.value.role == "control-plane" ? "t3.medium" : "t3.small"
    key_name                    = var.key_name
    subnet_id                   = data.aws_subnets.default.ids[0]
    vpc_security_group_ids      = [aws_security_group.nodes_sg.id]

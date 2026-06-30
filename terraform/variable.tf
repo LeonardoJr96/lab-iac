@@ -15,12 +15,6 @@ variable "ami_id" {
    type        = string
 }
 
-variable "instance_type" {
-   description = "Tipo da instância EC2"
-   type        = string
-   default     = "t3.small"
-}
-
 variable "key_name" {
    description = "Nome da chave SSH cadastrada na AWS"
    type        = string
@@ -35,4 +29,13 @@ variable "aws_vpc" {
     description = ""
     type        = string
     default     = "lab-devops"
+}
+
+variable "nodes" {
+  default = {
+    "control-plane"       = { role = "control-plane" }
+    "worker-1"  = { role = "frontend" }
+    "worker-2" = { role = "backend" }
+    "worker-3" = { role = "backend" }
+  }
 }

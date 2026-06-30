@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minha-app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: minha-imagem:latest
+        # Note que NÃO tem nodeSelector aqui   
