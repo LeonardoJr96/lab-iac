@@ -1,0 +1,27 @@
+
+---
+- name: Instalar e Configurar Nginx
+  hosts: frontend_workers
+  become: true
+  tasks:
+    - name: Instalar Nginx
+      apt:
+        name: nginx
+        update_cache: yes
+        state: latest
+
+    - name: Garantir que Nginx está ativo e iniciado
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Permitir tráfego HTTP no firewall (UFW)
+      ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
+      ignore_errors: yes # Ignora erro se UFW não estiver instalado
+
+    - name: Testar configuração do Nginx
+      command: nginx -t   
